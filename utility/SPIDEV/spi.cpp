@@ -13,6 +13,27 @@
 #include <pthread.h>
 static pthread_mutex_t spiMutex;
 
+struct spi_ioc_transfer_ {
+        __u64           tx_buf;
+        __u64           rx_buf;
+
+        __u32           len;
+        __u32           speed_hz;
+
+
+        __u16           delay_usecs;
+        __u16           interbyte_usecs;
+        __u8            bits_per_word;
+        __u8            cs_change;
+        __u32           pad;
+};
+
+
+#define SPI_MSGSIZE_(N) \
+        ((((N)*(sizeof (struct spi_ioc_transfer_))) < (1 << _IOC_SIZEBITS)) \
+                 ? ((N)*(sizeof (struct spi_ioc_transfer_))) : 0)
+#define SPI_IOC_MESSAGE_(N) _IOW(SPI_IOC_MAGIC, 0, char[SPI_MSGSIZE_(N)])
+
 SPI::SPI():fd(-1) {
 }
 
@@ -55,7 +76,7 @@ void SPI::init()
 	if (ret == -1)
 	{
 		perror("can't set spi mode");
-		abort();		
+		abort();
 	}
 
 	ret = ioctl(this->fd, SPI_IOC_RD_MODE, &this->mode);
@@ -107,36 +128,21 @@ uint8_t SPI::transfer(uint8_t tx_)
 	uint8_t rx[1];
      
     this->init();
-	struct spi_ioc_transfer tr = {
-	tr.tx_buf = (unsigned long)&tx[0],
-	tr.rx_buf = (unsigned long)&rx[0],
-	tr.len = 1,//ARRAY_SIZE(tx),
-	tr.delay_usecs = 0,
-	tr.cs_change=1,
-	tr.bits_per_word = this->bits,
-	};
-	
-    tr.speed_hz = this->speed,	
-	//Note: On RPi, for some reason I started getting 'bad message' errors, and changing the struct as below fixed it, until an update...??
-	//
-	/*	// One byte is transfered at once
+    struct spi_ioc_transfer_ tr;
 
-
-	uint8_t rx[ARRAY_SIZE(tx)] = {0};
-	struct spi_ioc_transfer tr;
-	tr.tx_buf = (unsigned long)tx;
-	tr.rx_buf = (unsigned long)rx;
-	tr.len = ARRAY_SIZE(tx);
-	tr.delay_usecs = 0;
+	tr.tx_buf = (unsigned long)&tx[0];
+	tr.rx_buf = (unsigned long)&rx[0];
+	tr.len = 1;
 	tr.cs_change = 1;
-	tr.speed_hz = this->speed;
-	tr.bits_per_word = this->bits;*/
+	tr.delay_usecs = 0;
+	tr.bits_per_word = bits;
+        tr.speed_hz = speed;
 
-	ret = ioctl(this->fd, SPI_IOC_MESSAGE(1), &tr);
+	ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
 	if (ret < 1)
 	{
         pthread_mutex_unlock (&spiMutex);
-		perror("can't send spi message");
+		perror("can't send spi message 1");
 		abort();		
 	}
 
@@ -150,38 +156,29 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 	
 	pthread_mutex_lock (&spiMutex);
 	int ret;
+
 	this->init();
-	struct spi_ioc_transfer tr = {
-		tr.tx_buf = (unsigned long)tbuf,
-		tr.rx_buf = (unsigned long)rbuf,
-		tr.len = len,//ARRAY_SIZE(tx),
-		tr.cs_change=1,
-		tr.delay_usecs = 0,
-		tr.bits_per_word = this->bits,
-	};
-        tr.speed_hz = this->speed,    
-	
-	//Note: On RPi, for some reason I started getting 'bad message' errors, and changing the struct as below fixed it, until an update...??
-	// One byte is transfered at once
-	//uint8_t tx[] = {0};
-	//tx[0] = tx_;
+	struct spi_ioc_transfer_ tr;
 
-	//uint8_t rx[ARRAY_SIZE(tx)] = {0};
-	/*struct spi_ioc_transfer tr;
-	tr.tx_buf = (unsigned long)tbuf;//(unsigned long)tx;
-	tr.rx_buf = (unsigned long)rbuf;//(unsigned long)rx;
-	tr.len = len;//ARRAY_SIZE(tx);
-	tr.delay_usecs = 0;
+	tr.tx_buf = (unsigned long)tbuf;
+	tr.rx_buf = (unsigned long)rbuf;
+	tr.len = len;
 	tr.cs_change = 1;
-	tr.speed_hz = this->speed;
-	tr.bits_per_word = this->bits;*/
+	tr.delay_usecs = 0;
+	tr.bits_per_word = bits;
+        tr.speed_hz = speed;
 
-	ret = ioctl(this->fd, SPI_IOC_MESSAGE(1), &tr);
+//        printf("[Writing %i, %i, %i]\n", (unsigned int)(tr.tx_buf) ,(unsigned int)(tr.rx_buf) , tr. len);
+//        printf("[Writing %i, %i, %i]\n",  tr.cs_change , tr.bits_per_word,  tr.speed_hz);
+//        printf("[Writing %i, %i, %i]\n",  fd , tr.cs_change,  tr.delay_usecs);
+
+
+	ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
 	if (ret < 1)
 	{
-        pthread_mutex_unlock (&spiMutex);
-		perror("can't send spi message");
-		abort();		
+            pthread_mutex_unlock (&spiMutex);
+             perror("can't send spi message 2");
+	  abort();
 	}
     pthread_mutex_unlock (&spiMutex);
 	//return rx[0];

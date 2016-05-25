@@ -60,7 +60,7 @@ void RF24::csn(bool mode)
 void RF24::ce(bool level)
 {
   //Allow for 3-pin use on ATTiny
-  if (ce_pin != csn_pin) digitalWrite(ce_pin,level);
+//  if (ce_pin != csn_pin) digitalWrite(ce_pin,level);
 }
 
 /****************************************************************************/

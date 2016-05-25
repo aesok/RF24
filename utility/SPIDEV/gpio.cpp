@@ -28,7 +28,7 @@ void GPIO::open(int port, int DDR)
 
     int counter = 0;
 	char file[128];    
-	sprintf(file, "/sys/class/gpio/gpio%d/direction", port);  
+	sprintf(file, "/sys/class/gpio/gpio22_ph15/direction"/*, port*/);
     
     while( ( f = fopen(file,"w")) == NULL ){ //Wait 10 seconds for the file to be accessible if not open on first attempt
         sleep(1);
