@@ -34,23 +34,17 @@ struct spi_ioc_transfer_ {
                  ? ((N)*(sizeof (struct spi_ioc_transfer_))) : 0)
 #define SPI_IOC_MESSAGE_(N) _IOW(SPI_IOC_MAGIC, 0, char[SPI_MSGSIZE_(N)])
 
-SPI::SPI():fd(-1) {
+SPI::SPI (const std::string & device_) 
+  : device (device_),
+    mode (0), // SPI_NO_CS
+    bits (8),
+    speed (RF24_SPIDEV_SPEED),
+    fd (-1)
+{
 }
 
-void SPI::begin(int busNo){
-
-	this->device = "/dev/spidev0.0";
-    /* set spidev accordingly to busNo like:
-     * busNo = 23 -> /dev/spidev2.3
-     *
-     * a bit messy but simple
-     * */
-    this->device[11] += (busNo / 10) % 10;
-    this->device[13] += busNo % 10;
-	this->bits = 8;
-	this->speed = RF24_SPIDEV_SPEED;
-	this->mode=0;
-    //this->mode |= SPI_NO_CS;
+void SPI::begin(int busNo)
+{
 	this->init();
 }
 

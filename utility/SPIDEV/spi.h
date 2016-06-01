@@ -50,7 +50,7 @@ public:
 	/**
 	* SPI constructor
 	*/	 
-	SPI();
+	SPI(const std::string & device_);
 	
 	/**
 	* Start SPI

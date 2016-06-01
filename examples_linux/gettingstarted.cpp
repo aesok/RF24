@@ -56,7 +56,8 @@ using namespace std;
 //RF24 radio(15,0);
 
 //RPi Alternate, with SPIDEV - Note: Edit RF24/arch/BBB/spi.cpp and  set 'this->device = "/dev/spidev0.0";;' or as listed in /dev
-RF24 radio(22,10);
+SPI spi("/dev/spidev1.0");
+RF24 radio (spi, 22,10);
 
 
 /****************** Linux (BBB,x86,etc) ***********************/

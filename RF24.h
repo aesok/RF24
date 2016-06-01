@@ -57,7 +57,10 @@ private:
   SPIUARTClass uspi;
 #endif
 
-#if defined (RF24_LINUX) || defined (XMEGA_D3) /* XMEGA can use SPI class */
+#if defined (RF24_LINUX)
+  SPI & spi;
+#endif
+#if defined (XMEGA_D3) /* XMEGA can use SPI class */
   SPI spi;
 #endif
 #if defined (MRAA)
@@ -108,7 +111,7 @@ public:
    * @param _cepin The pin attached to Chip Enable on the RF module
    * @param _cspin The pin attached to Chip Select
    */
-  RF24(uint8_t _cepin, uint8_t _cspin);
+  RF24(SPI & spi_, uint8_t _cepin, uint8_t _cspin);
   //#if defined (RF24_LINUX)
   
     /**
@@ -122,7 +125,7 @@ public:
   * @param spispeed For RPi, the SPI speed in MHZ ie: BCM2835_SPI_SPEED_8MHZ
   */
   
-  RF24(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
+  RF24(SPI & spi_, uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
   //#endif
 
   #if defined (RF24_LINUX)
