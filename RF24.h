@@ -68,7 +68,6 @@ private:
 #endif
 
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
-  uint16_t spi_speed; /**< SPI Bus Speed */
 #if defined (RF24_LINUX) || defined (XMEGA_D3)
   uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
   uint8_t spi_txbuff[32+1] ; //SPI transmit buffer (payload max 32 bytes + 1 byte for the command)
@@ -111,21 +110,6 @@ public:
    * @param _cspin The pin attached to Chip Select
    */
   RF24(SPI & spi_, uint8_t _cepin);
-  //#if defined (RF24_LINUX)
-  
-    /**
-  * Optional Raspberry Pi Constructor
-  *
-  * Creates a new instance of this driver.  Before using, you create an instance
-  * and send in the unique pins that this chip is connected to.
-  *
-  * @param spi_ TODO: Add description
-  * @param _cepin The pin attached to Chip Enable on the RF module
-  * @param spispeed For RPi, the SPI speed in MHZ ie: BCM2835_SPI_SPEED_8MHZ
-  */
-  
-  RF24(SPI & spi_, uint8_t _cepin, uint32_t spispeed );
-  //#endif
 
   #if defined (RF24_LINUX)
   virtual ~RF24() {};

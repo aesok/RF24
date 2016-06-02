@@ -425,17 +425,6 @@ RF24::RF24(SPI & spi_, uint8_t _cepin):
 
 /****************************************************************************/
 
-#if defined (RF24_LINUX) && !defined (MRAA)//RPi constructor
-RF24::RF24(SPI & spi_, uint8_t _cepin, uint32_t _spi_speed):
-  spi (spi_),
-  ce_pin(_cepin), spi_speed(_spi_speed),p_variant(false), payload_size(32), dynamic_payloads_enabled(false),addr_width(5)//,pipe0_reading_address(0)
-{
-  pipe0_reading_address[0]=0;
-}
-#endif
-
-/****************************************************************************/
-
 void RF24::setChannel(uint8_t channel)
 {
   const uint8_t max_channel = 125;
@@ -523,25 +512,6 @@ void RF24::printDetails(void)
     csn_pin==RPI_V2_GPIO_P1_26 ? " (CE1) Software Driven" : "" );
   }
   printf("CE Pin  \t = Custom GPIO%d\n", ce_pin );
-  printf("Clock Speed\t = " );
-	switch (spi_speed)
-	{
-		case BCM2835_SPI_SPEED_64MHZ : printf("64 Mhz");	break ;
-		case BCM2835_SPI_SPEED_32MHZ : printf("32 Mhz");	break ;
-		case BCM2835_SPI_SPEED_16MHZ : printf("16 Mhz");	break ;
-		case BCM2835_SPI_SPEED_8MHZ  : printf("8 Mhz");	break ;
-		case BCM2835_SPI_SPEED_4MHZ  : printf("4 Mhz");	break ;
-		case BCM2835_SPI_SPEED_2MHZ  : printf("2 Mhz");	break ;
-		case BCM2835_SPI_SPEED_1MHZ  : printf("1 Mhz");	break ;
-		case BCM2835_SPI_SPEED_512KHZ: printf("512 KHz");	break ;
-		case BCM2835_SPI_SPEED_256KHZ: printf("256 KHz");	break ;
-		case BCM2835_SPI_SPEED_128KHZ: printf("128 KHz");	break ;
-		case BCM2835_SPI_SPEED_64KHZ : printf("64 KHz");	break ;
-		case BCM2835_SPI_SPEED_32KHZ : printf("32 KHz");	break ;
-		case BCM2835_SPI_SPEED_16KHZ : printf("16 KHz");	break ;
-		case BCM2835_SPI_SPEED_8KHZ  : printf("8 KHz");	break ;
-		default : printf("8 Mhz");	break ;
-	}
 	printf("\n================ NRF Configuration ================\n");
  
 #endif //Linux
