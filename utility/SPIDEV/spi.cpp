@@ -43,7 +43,7 @@ SPI::SPI (const std::string & device_)
 {
 }
 
-void SPI::begin(int busNo)
+void SPI::begin()
 {
 	this->init();
 }

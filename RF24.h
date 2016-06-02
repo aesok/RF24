@@ -68,7 +68,6 @@ private:
 #endif
 
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
-  uint8_t csn_pin; /**< SPI Chip select */
   uint16_t spi_speed; /**< SPI Bus Speed */
 #if defined (RF24_LINUX) || defined (XMEGA_D3)
   uint8_t spi_rxbuff[32+1] ; //SPI receive buffer (payload max 32 bytes)
@@ -108,10 +107,10 @@ public:
    * Creates a new instance of this driver.  Before using, you create an instance
    * and send in the unique pins that this chip is connected to.
    *
-   * @param _cepin The pin attached to Chip Enable on the RF module
+   * @param spi_ TODO: Add description
    * @param _cspin The pin attached to Chip Select
    */
-  RF24(SPI & spi_, uint8_t _cepin, uint8_t _cspin);
+  RF24(SPI & spi_, uint8_t _cepin);
   //#if defined (RF24_LINUX)
   
     /**
@@ -120,12 +119,12 @@ public:
   * Creates a new instance of this driver.  Before using, you create an instance
   * and send in the unique pins that this chip is connected to.
   *
+  * @param spi_ TODO: Add description
   * @param _cepin The pin attached to Chip Enable on the RF module
-  * @param _cspin The pin attached to Chip Select
   * @param spispeed For RPi, the SPI speed in MHZ ie: BCM2835_SPI_SPEED_8MHZ
   */
   
-  RF24(SPI & spi_, uint8_t _cepin, uint8_t _cspin, uint32_t spispeed );
+  RF24(SPI & spi_, uint8_t _cepin, uint32_t spispeed );
   //#endif
 
   #if defined (RF24_LINUX)
@@ -639,12 +638,12 @@ s   *
 
   /**
    * Test whether this is a real radio, or a mock shim for
-   * debugging.  Setting either pin to 0xff is the way to
+   * debugging.  Setting ce pin to 0xff is the way to
    * indicate that this is not a real radio.
    *
    * @return true if this is a legitimate radio
    */
-  bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; }
+  bool isValid() { return ce_pin != 0xff; }
   
    /**
    * Close a pipe after it has been previously opened.

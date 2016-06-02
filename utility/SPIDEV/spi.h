@@ -55,7 +55,7 @@ public:
 	/**
 	* Start SPI
 	*/
-	void begin(int busNo);
+	void begin ();
 	
 	/**
 	* Transfer a single byte
