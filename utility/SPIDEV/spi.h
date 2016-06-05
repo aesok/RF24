@@ -24,6 +24,7 @@
  */
  
 #include <string>
+#include <mutex>
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -92,6 +93,8 @@ private:
 	/** Set SPI speed*/
 	uint32_t speed;
 	int fd;
+
+	std::mutex mtx;
 
 	void init();	
 };

@@ -10,9 +10,6 @@
 
 #include "spi.h"
 
-#include <pthread.h>
-static pthread_mutex_t spiMutex;
-
 struct spi_ioc_transfer_ {
         __u64           tx_buf;
         __u64           rx_buf;
@@ -116,7 +113,8 @@ void SPI::init()
 
 uint8_t SPI::transfer(uint8_t tx_)
 {
-    pthread_mutex_lock (&spiMutex);
+  std::lock_guard <std::mutex> guard (mtx);
+
 	int ret;
   	uint8_t tx[1] = {tx_};
 	uint8_t rx[1];
@@ -135,20 +133,18 @@ uint8_t SPI::transfer(uint8_t tx_)
 	ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
 	if (ret < 1)
 	{
-        pthread_mutex_unlock (&spiMutex);
 		perror("can't send spi message 1");
 		abort();		
 	}
 
-    pthread_mutex_unlock (&spiMutex);
 	return rx[0];
 }
 
 //void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
 void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 {
-	
-	pthread_mutex_lock (&spiMutex);
+  std::lock_guard <std::mutex> guard (mtx);
+
 	int ret;
 
 	this->init();
@@ -170,11 +166,9 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 	ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
 	if (ret < 1)
 	{
-            pthread_mutex_unlock (&spiMutex);
              perror("can't send spi message 2");
 	  abort();
 	}
-    pthread_mutex_unlock (&spiMutex);
 	//return rx[0];
 }
 
