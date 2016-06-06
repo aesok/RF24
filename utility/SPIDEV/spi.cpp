@@ -111,6 +111,30 @@ void SPI::init()
 	}
 }
 
+void
+SPI::transfer (gsl::span<uint8_t> const & data)
+{
+  std::lock_guard <std::mutex> guard (mtx);
+
+  init ();
+
+  struct spi_ioc_transfer_ tr;
+  tr.tx_buf = reinterpret_cast <typeof (tr.tx_buf)> (data.data ());
+  tr.rx_buf = reinterpret_cast <typeof (tr.rx_buf)> (data.data ());
+  tr.len = data.size ();
+  tr.cs_change = 1;
+  tr.delay_usecs = 0;
+  tr.bits_per_word = bits;
+  tr.speed_hz = speed;
+
+  int ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
+  if (ret < 1)
+  {
+    perror("can't send spi message 2");
+    abort();
+  }
+}
+
 uint8_t SPI::transfer(uint8_t tx_)
 {
   std::lock_guard <std::mutex> guard (mtx);

@@ -36,6 +36,8 @@
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
 
+#include <span.h>
+
 #ifndef RF24_SPIDEV_SPEED
 /* 8MHz as default */
 #define RF24_SPIDEV_SPEED 8000000
@@ -57,6 +59,12 @@ public:
 	* Start SPI
 	*/
 	void begin ();
+
+	/**
+	* Transfer a buffer of data
+	* @param buf buffer of data
+	*/
+	void transfer (gsl::span<uint8_t> const & data);
 	
 	/**
 	* Transfer a single byte
