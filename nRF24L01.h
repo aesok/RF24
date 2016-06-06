@@ -23,6 +23,8 @@
     DEALINGS IN THE SOFTWARE.
 */
 
+#include <cstdint>
+
 /* Memory Map */
 #define NRF_CONFIG      0x00
 #define EN_AA       0x01
@@ -125,3 +127,20 @@
 #define RF_DR_HIGH  3
 #define RF_PWR_LOW  1
 #define RF_PWR_HIGH 2
+
+namespace nRF24L01
+{
+
+constexpr std::uint8_t
+make_read_reg (std::uint8_t reg)
+{
+  return (R_REGISTER | (REGISTER_MASK & reg));
+}
+
+constexpr std::uint8_t
+make_write_reg (std::uint8_t reg)
+{
+  return (W_REGISTER | (REGISTER_MASK & reg));
+}
+
+};
