@@ -131,6 +131,8 @@
 namespace nRF24L01
 {
 
+static constexpr uint8_t max_register_size = 5;
+
 constexpr std::uint8_t
 make_read_reg (std::uint8_t reg)
 {

@@ -87,22 +87,20 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
 {
   uint8_t status;
 
-  #if defined (RF24_LINUX)
+#if defined (RF24_LINUX)
   beginTransaction(); //configures the spi settings for RPi, locks mutex and setting csn low
-  uint8_t * prx = spi_rxbuff;
-  uint8_t * ptx = spi_txbuff;
-  uint8_t size = len + 1; // Add register value to transmit buffer
 
-  *ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
+  // Or assert (len <= nRF24L01::max_register_size);
+  len = std::min <uint8_t> (len, nRF24L01::max_register_size);
 
-  while (len--){ *ptx++ = NOP; } // Dummy operation, just for reading
-  
-  _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
-  
-  status = *prx++; // status is 1st byte of receive buffer
+  array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
+  buffer [0] = nRF24L01::make_read_reg (reg);
+  std::fill_n (std::next (std::begin (buffer)), len, NOP);
+  spi.transfer (gsl::as_span (buffer.data (), len + 1));
+  std::copy_n (std::next (std::begin (buffer)), len , buf);
 
-  // decrement before to skip status byte
-  while ( --size ){ *buf++ = *prx++; } 
+  status = 0;
+
   endTransaction(); //unlocks mutex and setting csn high
 
 #else
@@ -128,15 +126,11 @@ uint8_t RF24::read_register(uint8_t reg)
   #if defined (RF24_LINUX)
 	
   beginTransaction();
-  
-  uint8_t * prx = spi_rxbuff;
-  uint8_t * ptx = spi_txbuff;	
-  *ptx++ = ( R_REGISTER | ( REGISTER_MASK & reg ) );
-  *ptx++ = NOP ; // Dummy operation, just for reading
-  
-  _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
-  result = *++prx;   // result is 2nd byte of receive buffer
-  
+
+  std::array <uint8_t, 2> buf {nRF24L01::make_read_reg (reg), NOP};
+  spi.transfer (gsl::as_span (buf));
+  result = buf[1];
+
   endTransaction();
   #else
 
