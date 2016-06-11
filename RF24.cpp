@@ -81,6 +81,28 @@ void RF24::ce(bool level)
 	#endif
   }
 
+//****************************************************************************/
+
+uint8_t RF24::read_register(const uint8_t reg, gsl::span<uint8_t> const & rx_data)
+{
+  uint8_t status;
+
+  beginTransaction();
+
+  // Or assert (len <= nRF24L01::max_register_size);
+  uint8_t len = std::min <uint8_t> (rx_data.size (), nRF24L01::max_register_size);
+
+  array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
+  buffer [0] = nRF24L01::make_read_reg (reg);
+  std::fill_n (std::next (std::begin (buffer)), len, NOP);
+  spi.transfer (gsl::as_span (buffer.data (), len + 1));
+  status = buffer [0];
+  std::copy_n (std::next (std::begin (buffer)), len , std::begin (rx_data));
+
+  endTransaction();
+
+  return status;
+}
 /****************************************************************************/
 
 uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
@@ -396,7 +418,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
   while (qty--)
   {
     uint8_t buffer[addr_width];
-    read_register(reg++,buffer,sizeof buffer);
+    read_register (reg++, gsl::as_span (buffer, sizeof buffer));
 
     printf_P(PSTR(" 0x"));
     uint8_t* bufptr = buffer + sizeof buffer;

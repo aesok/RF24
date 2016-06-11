@@ -15,6 +15,8 @@
 #ifndef __RF24_H__
 #define __RF24_H__
 
+#include <span.h>
+
 #include "RF24_config.h"
 
 #if defined (RF24_LINUX) || defined (LITTLEWIRE)
@@ -993,6 +995,15 @@ private:
    * @return Current value of status register
    */
   uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
+
+  /**
+   * Write a chunk of data to a register
+   *
+   * @param reg Which register. Use constants from nRF24L01.h
+   * @param rx_data Where to get the data
+   * @return Current value of status register
+   */
+  uint8_t read_register(const uint8_t reg, gsl::span<uint8_t> const & rx_data);
 
   /**
    * Write a single byte to a register
