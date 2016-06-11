@@ -99,7 +99,7 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   spi.transfer (gsl::as_span (buffer.data (), len + 1));
   std::copy_n (std::next (std::begin (buffer)), len , buf);
 
-  status = 0;
+  status = buffer [0];
 
   endTransaction(); //unlocks mutex and setting csn high
 
