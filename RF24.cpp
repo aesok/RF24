@@ -341,15 +341,13 @@ uint8_t RF24::flush_tx(void)
 
 /****************************************************************************/
 
-uint8_t RF24::spiTrans(uint8_t cmd){
-
-  uint8_t status;
-  
+uint8_t RF24::spiTrans(uint8_t cmd)
+{
   beginTransaction();
-  status = _SPI.transfer( cmd );
+  spi.transfer (gsl::as_span (&cmd, 1));
   endTransaction();
   
-  return status;
+  return cmd;
 }
 
 /****************************************************************************/
@@ -1207,10 +1205,10 @@ void RF24::closeReadingPipe( uint8_t pipe )
 
 void RF24::toggle_features(void)
 {
-    beginTransaction();
-	_SPI.transfer( ACTIVATE );
-    _SPI.transfer( 0x73 );
-	endTransaction();
+  beginTransaction();
+  std::array<uint8_t, 2> buffer {ACTIVATE, 0x73};
+  spi.transfer (gsl::as_span (buffer));
+  endTransaction();
 }
 
 /****************************************************************************/
