@@ -135,35 +135,6 @@ SPI::transfer (gsl::span<uint8_t> const & data)
   }
 }
 
-uint8_t SPI::transfer(uint8_t tx_)
-{
-  std::lock_guard <std::mutex> guard (mtx);
-
-	int ret;
-  	uint8_t tx[1] = {tx_};
-	uint8_t rx[1];
-     
-    this->init();
-    struct spi_ioc_transfer_ tr;
-
-	tr.tx_buf = (unsigned long)&tx[0];
-	tr.rx_buf = (unsigned long)&rx[0];
-	tr.len = 1;
-	tr.cs_change = 1;
-	tr.delay_usecs = 0;
-	tr.bits_per_word = bits;
-        tr.speed_hz = speed;
-
-	ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
-	if (ret < 1)
-	{
-		perror("can't send spi message 1");
-		abort();		
-	}
-
-	return rx[0];
-}
-
 //void bcm2835_spi_transfernb(char* tbuf, char* rbuf, uint32_t len)
 void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 {

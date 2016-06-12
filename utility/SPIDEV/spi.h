@@ -67,13 +67,6 @@ public:
 	void transfer (gsl::span<uint8_t> const & data);
 	
 	/**
-	* Transfer a single byte
-	* @param tx_ Byte to send
-	* @return Data returned via spi
-	*/
-	uint8_t transfer(uint8_t tx_);
-	
-	/**
 	* Transfer a buffer of data
 	* @param tbuf Transmit buffer
 	* @param rbuf Receive buffer
