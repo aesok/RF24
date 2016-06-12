@@ -174,16 +174,13 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 
   #if defined (RF24_LINUX) 
   beginTransaction();
-  uint8_t * prx = spi_rxbuff;
-  uint8_t * ptx = spi_txbuff;
-  uint8_t size = len + 1; // Add register value to transmit buffer
 
-  *ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
-  while ( len-- )
-    *ptx++ = *buf++;
-  
-  _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
-  status = *prx; // status is 1st byte of receive buffer
+  array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
+  buffer [0] = nRF24L01::make_write_reg (reg);
+  std::copy_n (buf, len, std::next (std::begin (buffer)));
+  spi.transfer (gsl::as_span (buffer));
+  status = buf[0];  // status is 1st byte of receive buffer
+
   endTransaction();
   #else
 
@@ -207,15 +204,13 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"),reg,value));
 
   #if defined (RF24_LINUX)
-    beginTransaction();
-	uint8_t * prx = spi_rxbuff;
-	uint8_t * ptx = spi_txbuff;
-	*ptx++ = ( W_REGISTER | ( REGISTER_MASK & reg ) );
-	*ptx = value ;	
-  	
-	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
-	status = *prx++; // status is 1st byte of receive buffer
-	endTransaction();
+  beginTransaction();
+
+  std::array <uint8_t, 2> buf {nRF24L01::make_write_reg (reg), value};
+  spi.transfer (gsl::as_span (buf));
+  status = buf[0];  // status is 1st byte of receive buffer
+
+  endTransaction();
   #else
 
   beginTransaction();
