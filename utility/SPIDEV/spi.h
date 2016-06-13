@@ -85,12 +85,12 @@ public:
 
 private:
 
+  static constexpr uint8_t bits_per_word = 8;
+
 	/** Default SPI device */
 	string device;
 	/** SPI Mode set */
 	uint8_t mode;
-	/** word size*/
-	uint8_t bits;
 	/** Set SPI speed*/
 	uint32_t speed;
 	int fd;

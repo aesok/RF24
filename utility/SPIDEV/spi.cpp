@@ -34,7 +34,6 @@ struct spi_ioc_transfer_ {
 SPI::SPI (const std::string & device_) 
   : device (device_),
     mode (0), // SPI_NO_CS
-    bits (8),
     speed (RF24_SPIDEV_SPEED),
     fd (-1)
 {
@@ -71,16 +70,6 @@ void SPI::init()
 	}
 
 	/*
-	 * bits per word
-	 */
-	ret = ioctl(this->fd, SPI_IOC_WR_BITS_PER_WORD, &this->bits);
-	if (ret == -1)
-	{
-		perror("can't set bits per word");
-		abort();				
-	}
-
-	/*
 	 * max speed hz
 	 */
 	ret = ioctl(this->fd, SPI_IOC_WR_MAX_SPEED_HZ, &this->speed);
@@ -104,7 +93,7 @@ SPI::transfer (gsl::span<uint8_t> const & data)
   tr.len = data.size ();
   tr.cs_change = 1;
   tr.delay_usecs = 0;
-  tr.bits_per_word = bits;
+  tr.bits_per_word = bits_per_word;
   tr.speed_hz = speed;
 
   int ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
@@ -130,7 +119,7 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 	tr.len = len;
 	tr.cs_change = 1;
 	tr.delay_usecs = 0;
-	tr.bits_per_word = bits;
+	tr.bits_per_word = bits_per_word;
         tr.speed_hz = speed;
 
 //        printf("[Writing %i, %i, %i]\n", (unsigned int)(tr.tx_buf) ,(unsigned int)(tr.rx_buf) , tr. len);
