@@ -37,6 +37,13 @@ SPI::SPI (const std::string & device_)
     speed (RF24_SPIDEV_SPEED),
     fd (-1)
 {
+  fd = open(this->device.c_str(), O_RDWR);
+
+  if (this->fd < 0)
+  {
+    perror("can't open device");
+    abort();
+  }
 }
 
 void SPI::begin()
@@ -48,17 +55,6 @@ void SPI::init()
 {
 	int ret;
     
-    if (this->fd < 0)  // check whether spi is already open
-    {
-	  this->fd = open(this->device.c_str(), O_RDWR);
-
-      if (this->fd < 0)
-      {
-        perror("can't open device");
-        abort();
-      }
-    }
-
 	/*
 	 * spi mode
 	 */
