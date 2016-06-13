@@ -70,13 +70,6 @@ void SPI::init()
 		abort();
 	}
 
-	ret = ioctl(this->fd, SPI_IOC_RD_MODE, &this->mode);
-	if (ret == -1)
-	{
-		perror("can't set spi mode");
-		abort();				
-	}
-	
 	/*
 	 * bits per word
 	 */
@@ -87,23 +80,10 @@ void SPI::init()
 		abort();				
 	}
 
-	ret = ioctl(this->fd, SPI_IOC_RD_BITS_PER_WORD, &this->bits);
-	if (ret == -1)
-	{
-		perror("can't set bits per word");
-		abort();						
-	}
 	/*
 	 * max speed hz
 	 */
 	ret = ioctl(this->fd, SPI_IOC_WR_MAX_SPEED_HZ, &this->speed);
-	if (ret == -1)
-	{
-		perror("can't set max speed hz");
-		abort();						
-	}
-
-	ret = ioctl(this->fd, SPI_IOC_RD_MAX_SPEED_HZ, &this->speed);
 	if (ret == -1)
 	{
 		perror("can't set max speed hz");
