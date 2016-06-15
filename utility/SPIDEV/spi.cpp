@@ -37,6 +37,8 @@ SPI::SPI (const std::string & device_)
     speed (RF24_SPIDEV_SPEED),
     fd (-1)
 {
+  int ret;
+
   fd = open(this->device.c_str(), O_RDWR);
 
   if (this->fd < 0)
@@ -44,44 +46,32 @@ SPI::SPI (const std::string & device_)
     perror("can't open device");
     abort();
   }
+
+  // Set spi mode
+  ret = ioctl (fd, SPI_IOC_WR_MODE, &mode);
+  if (ret == -1)
+  {
+    perror ("can't set spi mode");
+    abort ();
+  }
+
+  // Set max speed hz
+  ret = ioctl (fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+  if (ret == -1)
+  {
+    perror ("can't set max speed hz");
+    abort ();
+  }
 }
 
 void SPI::begin()
 {
-	this->init();
-}
-
-void SPI::init()
-{
-	int ret;
-    
-	/*
-	 * spi mode
-	 */
-	ret = ioctl(this->fd, SPI_IOC_WR_MODE, &this->mode);
-	if (ret == -1)
-	{
-		perror("can't set spi mode");
-		abort();
-	}
-
-	/*
-	 * max speed hz
-	 */
-	ret = ioctl(this->fd, SPI_IOC_WR_MAX_SPEED_HZ, &this->speed);
-	if (ret == -1)
-	{
-		perror("can't set max speed hz");
-		abort();						
-	}
 }
 
 void
 SPI::transfer (gsl::span<uint8_t> const & data)
 {
   std::lock_guard <std::mutex> guard (mtx);
-
-  init ();
 
   struct spi_ioc_transfer_ tr;
   tr.tx_buf = reinterpret_cast <typeof (tr.tx_buf)> (data.data ());
@@ -107,7 +97,6 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 
 	int ret;
 
-	this->init();
 	struct spi_ioc_transfer_ tr;
 
 	tr.tx_buf = (unsigned long)tbuf;

@@ -96,8 +96,6 @@ private:
 	int fd;
 
 	std::mutex mtx;
-
-	void init();	
 };
 
 /**
