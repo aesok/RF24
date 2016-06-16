@@ -37,6 +37,7 @@
 #include <linux/spi/spidev.h>
 
 #include <span.h>
+#include <scope>
 
 #ifndef RF24_SPIDEV_SPEED
 /* 8MHz as default */
@@ -46,6 +47,18 @@
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 using namespace std;
+
+static auto
+make_spi_handle (const std::string& name)
+{
+  using namespace std::experimental;
+
+  return make_unique_resource_checked(::open(name.c_str(), O_RDWR),
+                                      -1, &::close);
+}
+
+using spi_handle = decltype (make_spi_handle (std::string ()));
+
 
 class SPI {
 public:
@@ -93,9 +106,9 @@ private:
 	uint8_t mode;
 	/** Set SPI speed*/
 	uint32_t speed;
-	int fd;
 
-	std::mutex mtx;
+  spi_handle h;
+  std::mutex mtx;
 };
 
 /**

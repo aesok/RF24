@@ -35,20 +35,18 @@ SPI::SPI (const std::string & device_)
   : device (device_),
     mode (0), // SPI_NO_CS
     speed (RF24_SPIDEV_SPEED),
-    fd (-1)
+    h (make_spi_handle (device))
 {
   int ret;
 
-  fd = open(this->device.c_str(), O_RDWR);
-
-  if (this->fd < 0)
+  if (h.get () < 0)
   {
     perror("can't open device");
     abort();
   }
 
   // Set spi mode
-  ret = ioctl (fd, SPI_IOC_WR_MODE, &mode);
+  ret = ::ioctl (h.get (), SPI_IOC_WR_MODE, &mode);
   if (ret == -1)
   {
     perror ("can't set spi mode");
@@ -56,7 +54,7 @@ SPI::SPI (const std::string & device_)
   }
 
   // Set max speed hz
-  ret = ioctl (fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+  ret = ::ioctl (h.get (), SPI_IOC_WR_MAX_SPEED_HZ, &speed);
   if (ret == -1)
   {
     perror ("can't set max speed hz");
@@ -82,7 +80,7 @@ SPI::transfer (gsl::span<uint8_t> const & data)
   tr.bits_per_word = bits_per_word;
   tr.speed_hz = speed;
 
-  int ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
+  int ret = ::ioctl (h.get (), SPI_IOC_MESSAGE_(1), &tr);
   if (ret < 1)
   {
     perror("can't send spi message 2");
@@ -112,7 +110,7 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 //        printf("[Writing %i, %i, %i]\n",  fd , tr.cs_change,  tr.delay_usecs);
 
 
-	ret = ioctl(this->fd, SPI_IOC_MESSAGE_(1), &tr);
+	ret = ::ioctl (h.get (), SPI_IOC_MESSAGE_(1), &tr);
 	if (ret < 1)
 	{
              perror("can't send spi message 2");
@@ -127,8 +125,7 @@ void SPI::transfern(char* buf, uint32_t len)
 }
 
 
-SPI::~SPI() {
-    if (!(this->fd < 0))
-	    close(this->fd);
+SPI::~SPI()
+{
 }
 
