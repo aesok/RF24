@@ -61,7 +61,7 @@ make_spi_handle (const std::string& name)
 using spi_handle = decltype (make_spi_handle (std::string ()));
 
 
-class SPI {
+class SPI final {
 public:
 	
 	/**
@@ -73,6 +73,8 @@ public:
              uint32_t speed_hz = spidev::default_speed,
              uint32_t mode = SPI_MODE_0);
 	
+	~SPI();
+
 	/**
 	* Start SPI
 	*/
@@ -99,7 +101,6 @@ public:
 	*/	
 	void transfern(char* buf, uint32_t len);
 	
-	virtual ~SPI();
 
 private:
 

@@ -59,6 +59,10 @@ SPI::SPI (const std::string & device, uint32_t speed_hz, uint32_t mode)
   }
 }
 
+SPI::~SPI()
+{
+}
+
 void SPI::begin()
 {
 }
@@ -120,9 +124,3 @@ void SPI::transfern(char* buf, uint32_t len)
 {
     transfernb(buf, buf, len);
 }
-
-
-SPI::~SPI()
-{
-}
-
