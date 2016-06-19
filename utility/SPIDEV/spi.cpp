@@ -31,10 +31,8 @@ struct spi_ioc_transfer_ {
                  ? ((N)*(sizeof (struct spi_ioc_transfer_))) : 0)
 #define SPI_IOC_MESSAGE_(N) _IOW(SPI_IOC_MAGIC, 0, char[SPI_MSGSIZE_(N)])
 
-SPI::SPI (const std::string & device_) 
-  : device (device_),
-    mode (0), // SPI_NO_CS
-    speed (RF24_SPIDEV_SPEED),
+SPI::SPI (const std::string & device, uint32_t mode)
+  : speed (RF24_SPIDEV_SPEED),
     h (make_spi_handle (device))
 {
   int ret;

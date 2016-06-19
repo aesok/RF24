@@ -65,8 +65,10 @@ public:
 	
 	/**
 	* SPI constructor
+	* @param device Device name
+	* @param mode Device mode
 	*/	 
-	SPI(const std::string & device_);
+	SPI(const std::string & device, uint32_t mode = SPI_MODE_0);
 	
 	/**
 	* Start SPI
@@ -100,10 +102,6 @@ private:
 
   static constexpr uint8_t bits_per_word = 8;
 
-	/** Default SPI device */
-	string device;
-	/** SPI Mode set */
-	uint8_t mode;
 	/** Set SPI speed*/
 	uint32_t speed;
 
