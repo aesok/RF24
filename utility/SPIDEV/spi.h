@@ -76,11 +76,6 @@ public:
 	~SPI();
 
 	/**
-	* Start SPI
-	*/
-	void begin ();
-
-	/**
 	* Transfer a buffer of data
 	* @param buf buffer of data
 	*/

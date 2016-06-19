@@ -572,8 +572,6 @@ bool RF24::begin(void)
 	  }
     #endif
 	
-    _SPI.begin ();
-
 	pinMode(ce_pin,OUTPUT);
 	ce(LOW);    
 

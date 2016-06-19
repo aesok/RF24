@@ -63,10 +63,6 @@ SPI::~SPI()
 {
 }
 
-void SPI::begin()
-{
-}
-
 void
 SPI::transfer (gsl::span<uint8_t> const & data)
 {
