@@ -119,8 +119,3 @@ void SPI::transfernb(char* tbuf, char* rbuf, uint32_t len)
 	}
 	//return rx[0];
 }
-
-void SPI::transfern(char* buf, uint32_t len)
-{
-    transfernb(buf, buf, len);
-}

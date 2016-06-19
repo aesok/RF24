@@ -94,14 +94,6 @@ public:
 	*/
 	void transfernb(char* tbuf, char* rbuf, uint32_t len);
 
-	/**
-	* Transfer a buffer of data without an rx buffer
-	* @param buf Pointer to a buffer of data
-	* @param len Length of the data
-	*/	
-	void transfern(char* buf, uint32_t len);
-	
-
 private:
 
   static constexpr uint8_t bits_per_word = 8;

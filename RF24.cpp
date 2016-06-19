@@ -1284,7 +1284,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
       *ptx++ =  *current++;
     }
 	
-    _SPI.transfern( (char *) spi_txbuff, size);
+    _SPI.transfernb ((char *) spi_txbuff, (char *) spi_txbuff, size);
 	endTransaction();
   #else
   beginTransaction();
