@@ -39,14 +39,15 @@
 #include <span.h>
 #include <scope>
 
-#ifndef RF24_SPIDEV_SPEED
-/* 8MHz as default */
-#define RF24_SPIDEV_SPEED 8000000
-#endif
-
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 using namespace std;
+
+namespace spidev {
+
+constexpr uint32_t default_speed = 8000000;
+
+}
 
 static auto
 make_spi_handle (const std::string& name)
@@ -68,7 +69,9 @@ public:
 	* @param device Device name
 	* @param mode Device mode
 	*/	 
-	SPI(const std::string & device, uint32_t mode = SPI_MODE_0);
+	SPI (const std::string & device,
+             uint32_t speed_hz = spidev::default_speed,
+             uint32_t mode = SPI_MODE_0);
 	
 	/**
 	* Start SPI
@@ -102,10 +105,9 @@ private:
 
   static constexpr uint8_t bits_per_word = 8;
 
-	/** Set SPI speed*/
-	uint32_t speed;
-
   spi_handle h;
+  uint32_t speed;
+
   std::mutex mtx;
 };
 
