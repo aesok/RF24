@@ -949,18 +949,6 @@ private:
   /**@{*/
 
   /**
-   * Set chip select pin
-   *
-   * Running SPI bus at PI_CLOCK_DIV2 so we don't waste time transferring data
-   * and best of all, we make use of the radio's FIFO buffers. A lower speed
-   * means we're less likely to effectively leverage our FIFOs and pay a higher
-   * AVR runtime cost as toll.
-   *
-   * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
-   */
-  void csn(bool mode);
-
-  /**
    * Set chip enable
    *
    * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
