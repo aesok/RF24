@@ -32,7 +32,7 @@ struct spi_ioc_transfer_ {
 #define SPI_IOC_MESSAGE_(N) _IOW(SPI_IOC_MAGIC, 0, char[SPI_MSGSIZE_(N)])
 
 SPI::SPI (const std::string & device, uint32_t speed_hz, uint32_t mode)
-  : h (make_spi_handle (device)), speed (speed_hz)
+  : h (spidev::make_spi_handle (device)), speed (speed_hz)
 {
   int ret;
 

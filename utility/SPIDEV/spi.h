@@ -45,7 +45,6 @@ namespace spidev {
 
 constexpr uint32_t default_speed = 8000000;
 
-}
 
 static auto
 make_spi_handle (const std::string& name)
@@ -58,6 +57,7 @@ make_spi_handle (const std::string& name)
 
 using spi_handle = decltype (make_spi_handle (std::string ()));
 
+}
 
 class SPI final {
 public:
@@ -91,7 +91,7 @@ private:
 
   static constexpr uint8_t bits_per_word = 8;
 
-  spi_handle h;
+  spidev::spi_handle h;
   uint32_t speed;
 
   std::mutex mtx;
