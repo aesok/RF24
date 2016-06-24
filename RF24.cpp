@@ -20,27 +20,9 @@ void RF24::ce(bool level)
 
 /****************************************************************************/
 
-  inline void RF24::beginTransaction() {
-    #if defined (RF24_SPI_TRANSACTIONS)
-    _SPI.beginTransaction(SPISettings(RF24_SPI_SPEED, MSBFIRST, SPI_MODE0));
-	#endif
-  }
-
-/****************************************************************************/
-
-  inline void RF24::endTransaction() {
-	#if defined (RF24_SPI_TRANSACTIONS)
-    _SPI.endTransaction();
-	#endif
-  }
-
-//****************************************************************************/
-
 uint8_t RF24::read_register(const uint8_t reg, gsl::span<uint8_t> const & rx_data)
 {
   uint8_t status;
-
-  beginTransaction();
 
   // Or assert (len <= nRF24L01::max_register_size);
   uint8_t len = std::min <uint8_t> (rx_data.size (), nRF24L01::max_register_size);
@@ -52,8 +34,6 @@ uint8_t RF24::read_register(const uint8_t reg, gsl::span<uint8_t> const & rx_dat
   status = buffer [0];
   std::copy_n (std::next (std::begin (buffer)), len , std::begin (rx_data));
 
-  endTransaction();
-
   return status;
 }
 /****************************************************************************/
@@ -63,7 +43,6 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   uint8_t status;
 
 #if defined (RF24_LINUX)
-  beginTransaction(); //configures the spi settings for RPi, locks mutex and setting csn low
 
   // Or assert (len <= nRF24L01::max_register_size);
   len = std::min <uint8_t> (len, nRF24L01::max_register_size);
@@ -75,8 +54,6 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   std::copy_n (std::next (std::begin (buffer)), len , buf);
 
   status = buffer [0];
-
-  endTransaction(); //unlocks mutex and setting csn high
 
 #else
 
@@ -100,13 +77,10 @@ uint8_t RF24::read_register(uint8_t reg)
   
   #if defined (RF24_LINUX)
 	
-  beginTransaction();
-
   std::array <uint8_t, 2> buf {nRF24L01::make_read_reg (reg), NOP};
   spi.transfer (gsl::as_span (buf));
   result = buf[1];
 
-  endTransaction();
   #else
 
   beginTransaction();
@@ -126,7 +100,6 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   uint8_t status;
 
   #if defined (RF24_LINUX) 
-  beginTransaction();
 
   array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
   buffer [0] = nRF24L01::make_write_reg (reg);
@@ -134,7 +107,6 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   spi.transfer (gsl::as_span (buffer));
   status = buf[0];  // status is 1st byte of receive buffer
 
-  endTransaction();
   #else
 
   beginTransaction();
@@ -157,13 +129,11 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   IF_SERIAL_DEBUG(printf_P(PSTR("write_register(%02x,%02x)\r\n"),reg,value));
 
   #if defined (RF24_LINUX)
-  beginTransaction();
 
   std::array <uint8_t, 2> buf {nRF24L01::make_write_reg (reg), value};
   spi.transfer (gsl::as_span (buf));
   status = buf[0];  // status is 1st byte of receive buffer
 
-  endTransaction();
   #else
 
   beginTransaction();
@@ -190,7 +160,6 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
   IF_SERIAL_DEBUG( printf("[Writing %u bytes %u blanks]\n",data_len,blank_len); );
   
  #if defined (RF24_LINUX)
-	beginTransaction();
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
     uint8_t size;
@@ -204,7 +173,6 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
 	
 	_SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, size);
 	status = *prx; // status is 1st byte of receive buffer
-	endTransaction();
 
   #else
 
@@ -238,7 +206,6 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
   IF_SERIAL_DEBUG( printf("[Reading %u bytes %u blanks]\n",data_len,blank_len); );
   
   #if defined (RF24_LINUX)
-	beginTransaction();
 	uint8_t * prx = spi_rxbuff;
 	uint8_t * ptx = spi_txbuff;
     uint8_t size;
@@ -260,7 +227,6 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
 		
       *current = *prx;
     }
-	endTransaction();
   #else
 
   beginTransaction();
@@ -296,9 +262,7 @@ uint8_t RF24::flush_tx(void)
 
 uint8_t RF24::spiTrans(uint8_t cmd)
 {
-  beginTransaction();
   spi.transfer (gsl::as_span (&cmd, 1));
-  endTransaction();
   
   return cmd;
 }
@@ -972,10 +936,8 @@ uint8_t RF24::getDynamicPayloadSize(void)
   #if defined (RF24_LINUX)  
   spi_txbuff[0] = R_RX_PL_WID;
   spi_rxbuff[1] = 0xff;
-  beginTransaction();
   _SPI.transfernb( (char *) spi_txbuff, (char *) spi_rxbuff, 2);
   result = spi_rxbuff[1];  
-  endTransaction();
   #else
   beginTransaction();
   _SPI.transfer( R_RX_PL_WID );
@@ -1156,10 +1118,8 @@ void RF24::closeReadingPipe( uint8_t pipe )
 
 void RF24::toggle_features(void)
 {
-  beginTransaction();
   std::array<uint8_t, 2> buffer {ACTIVATE, 0x73};
   spi.transfer (gsl::as_span (buffer));
-  endTransaction();
 }
 
 /****************************************************************************/
@@ -1227,7 +1187,6 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
   uint8_t data_len = rf24_min(len,32);
 
   #if defined (RF24_LINUX)
-    beginTransaction();
     uint8_t * ptx = spi_txbuff;
     uint8_t size = data_len + 1 ; // Add register value to transmit buffer
 	*ptx++ =  W_ACK_PAYLOAD | ( pipe & 0b111 );
@@ -1236,7 +1195,6 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
     }
 	
     _SPI.transfernb ((char *) spi_txbuff, (char *) spi_txbuff, size);
-	endTransaction();
   #else
   beginTransaction();
   _SPI.transfer(W_ACK_PAYLOAD | ( pipe & 0b111 ) );

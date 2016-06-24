@@ -82,17 +82,6 @@ private:
   uint32_t txRxDelay; /**< Var for adjusting delays depending on datarate */
   
 
-protected:
-  /**
-   * SPI transactions
-   *
-   * Common code for SPI transactions including CSN toggle
-   *
-   */
-  inline void beginTransaction();
-
-  inline void endTransaction();
-
 public:
 
   /**
