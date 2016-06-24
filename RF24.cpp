@@ -36,38 +36,6 @@ uint8_t RF24::read_register(const uint8_t reg, gsl::span<uint8_t> const & rx_dat
 
   return status;
 }
-/****************************************************************************/
-
-uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
-{
-  uint8_t status;
-
-#if defined (RF24_LINUX)
-
-  // Or assert (len <= nRF24L01::max_register_size);
-  len = std::min <uint8_t> (len, nRF24L01::max_register_size);
-
-  array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
-  buffer [0] = nRF24L01::make_read_reg (reg);
-  std::fill_n (std::next (std::begin (buffer)), len, NOP);
-  spi.transfer (gsl::as_span (buffer.data (), len + 1));
-  std::copy_n (std::next (std::begin (buffer)), len , buf);
-
-  status = buffer [0];
-
-#else
-
-  beginTransaction();
-  status = _SPI.transfer( R_REGISTER | ( REGISTER_MASK & reg ) );
-  while ( len-- ){
-    *buf++ = _SPI.transfer(0xff);
-  }
-  endTransaction();
-
-#endif
-
-  return status;
-}
 
 /****************************************************************************/
 

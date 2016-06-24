@@ -946,16 +946,6 @@ private:
   void ce(bool level);
 
   /**
-   * Read a chunk of data in from a register
-   *
-   * @param reg Which register. Use constants from nRF24L01.h
-   * @param buf Where to put the data
-   * @param len How many bytes of data to transfer
-   * @return Current value of status register
-   */
-  uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len);
-
-  /**
    * Read single byte from a register
    *
    * @param reg Which register. Use constants from nRF24L01.h
