@@ -39,8 +39,6 @@
 #include <span.h>
 #include <scope>
 
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
-
 using namespace std;
 
 namespace spidev {
