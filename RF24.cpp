@@ -63,6 +63,22 @@ uint8_t RF24::read_register(uint8_t reg)
 
 /****************************************************************************/
 
+uint8_t RF24::write_register (uint8_t reg, gsl::span<uint8_t> const & rx_data)
+{
+  uint8_t status;
+
+  array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
+  buffer [0] = nRF24L01::make_write_reg (reg);
+  std::copy_n (rx_data.data (), rx_data.size (), std::next (std::begin (buffer)));
+  spi.transfer (gsl::as_span (buffer));
+  status = buffer [0];
+
+  return status;
+}
+
+
+/****************************************************************************/
+
 uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
 {
   uint8_t status;
@@ -1060,11 +1076,9 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t *address)
   if (child <= 6)
   {
     // For pipes 2-5, only write the LSB
-    if ( child < 2 ){
-      write_register(pgm_read_byte(&child_pipe[child]), address, addr_width);
-    }else{
-      write_register(pgm_read_byte(&child_pipe[child]), address, 1);
-	}
+    uint8_t size = (child < 2) ? addr_width : 1;
+    write_register (pgm_read_byte(&child_pipe[child]), address, size);
+
     write_register(pgm_read_byte(&child_payload_size[child]),payload_size);
 
     // Note it would be more efficient to set all of the bits for all open

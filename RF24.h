@@ -981,6 +981,8 @@ private:
    */
   uint8_t write_register(uint8_t reg, uint8_t value);
 
+  uint8_t write_register (uint8_t reg, gsl::span<uint8_t> const & rx_data);
+
   /**
    * Write the transmit payload
    *
