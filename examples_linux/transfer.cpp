@@ -70,7 +70,7 @@ RF24 radio (spi, 22);
 const uint64_t addresses[2] = { 0xABCDABCD71LL, 0x544d52687CLL };
 
 
-uint8_t data[32];
+uint8_t data_[32];
 unsigned long startTime, stopTime, counter, rxTimer=0;
 
 int main(int argc, char** argv){
@@ -120,7 +120,7 @@ int main(int argc, char** argv){
 
 
   for(int i=0; i<32; i++){
-     data[i] = rand() % 255;               			//Load the buffer with random data
+     data_[i] = rand() % 255;               			//Load the buffer with random data
   }
 
     // forever loop
@@ -136,8 +136,8 @@ int main(int argc, char** argv){
 		startTime = millis();
 	
 		for(int i=0; i<cycles; i++){        		//Loop through a number of cycles
-      			data[0] = i;                        //Change the first byte of the payload for identification
-      			if(!radio.writeFast(&data,32)){     //Write to the FIFO buffers
+			data_[0] = i;                        //Change the first byte of the payload for identification
+			if(!radio.writeFast(&data_,32)){     //Write to the FIFO buffers
         			counter++;                      //Keep count of failed payloads
       			}
 
@@ -165,7 +165,7 @@ int main(int argc, char** argv){
 
 if(role == role_pong_back){
      while(radio.available()){
-      radio.read(&data,32);
+      radio.read(&data_,32);
       counter++;
      }
    if(millis() - rxTimer > 1000){
