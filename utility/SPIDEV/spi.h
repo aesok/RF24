@@ -36,7 +36,7 @@
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
 
-#include <span.h>
+#include <span>
 #include <scope>
 
 using namespace std;

@@ -15,7 +15,7 @@
 #ifndef __RF24_H__
 #define __RF24_H__
 
-#include <span.h>
+#include <span>
 
 #include "RF24_config.h"
 
