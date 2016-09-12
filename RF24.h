@@ -230,6 +230,17 @@ s   *
   void openWritingPipe(const uint8_t *address);
 
   /**
+   * Open a pipe for writing.
+   *
+   * Only one writing pipe can be open at once, but you can change the address
+   * you'll write to. Call stopListening() first.
+   *
+   * @param address The address of the pipe to open. Coordinate these pipe
+   * addresses amongst nodes on the network.
+   */
+  void openWritingPipe (gsl::span<uint8_t> const & address);
+
+  /**
    * Open a pipe for reading
    *
    * Up to 6 pipes can be open for reading at once.  Open all the required

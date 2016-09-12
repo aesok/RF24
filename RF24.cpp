@@ -986,6 +986,17 @@ void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
   rx_ready = status & _BV(RX_DR);
 }
 
+
+/****************************************************************************/
+
+void RF24::openWritingPipe (gsl::span<uint8_t> const & address)
+{
+  write_register (RX_ADDR_P0, address.first (addr_width));
+  write_register (TX_ADDR, address.first (addr_width));
+
+  write_register (RX_PW_P0, payload_size);
+}
+
 /****************************************************************************/
 
 void RF24::openWritingPipe(uint64_t value)
