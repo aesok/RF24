@@ -30,7 +30,7 @@ uint8_t RF24::read_register(const uint8_t reg, gsl::span<uint8_t> const & rx_dat
   array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
   buffer [0] = nRF24L01::make_read_reg (reg);
   std::fill_n (std::next (std::begin (buffer)), len, NOP);
-  spi.transfer (gsl::as_span (buffer.data (), len + 1));
+  spi.transfer ({buffer.data (), len + 1});
   status = buffer [0];
   std::copy_n (std::next (std::begin (buffer)), len , std::begin (rx_data));
 
@@ -46,7 +46,7 @@ uint8_t RF24::read_register(uint8_t reg)
   #if defined (RF24_LINUX)
 	
   std::array <uint8_t, 2> buf {nRF24L01::make_read_reg (reg), NOP};
-  spi.transfer (gsl::as_span (buf));
+  spi.transfer (buf);
   result = buf[1];
 
   #else
@@ -70,7 +70,7 @@ uint8_t RF24::write_register (uint8_t reg, gsl::span<uint8_t> const & rx_data)
   array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
   buffer [0] = nRF24L01::make_write_reg (reg);
   std::copy_n (rx_data.data (), rx_data.size (), std::next (std::begin (buffer)));
-  spi.transfer (gsl::as_span (buffer));
+  spi.transfer (buffer);
   status = buffer [0];
 
   return status;
@@ -88,7 +88,7 @@ uint8_t RF24::write_register(uint8_t reg, const uint8_t* buf, uint8_t len)
   array <uint8_t, 1 + nRF24L01::max_register_size> buffer;
   buffer [0] = nRF24L01::make_write_reg (reg);
   std::copy_n (buf, len, std::next (std::begin (buffer)));
-  spi.transfer (gsl::as_span (buffer));
+  spi.transfer (buffer);
   status = buf[0];  // status is 1st byte of receive buffer
 
   #else
@@ -115,7 +115,7 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
   #if defined (RF24_LINUX)
 
   std::array <uint8_t, 2> buf {nRF24L01::make_write_reg (reg), value};
-  spi.transfer (gsl::as_span (buf));
+  spi.transfer (buf);
   status = buf[0];  // status is 1st byte of receive buffer
 
   #else
@@ -246,7 +246,7 @@ uint8_t RF24::flush_tx(void)
 
 uint8_t RF24::spiTrans(uint8_t cmd)
 {
-  spi.transfer (gsl::as_span (&cmd, 1));
+  spi.transfer ({&cmd, 1});
   
   return cmd;
 }
@@ -312,7 +312,7 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
   while (qty--)
   {
     uint8_t buffer[addr_width];
-    read_register (reg++, gsl::as_span (buffer, sizeof buffer));
+    read_register (reg++, {&buffer[0], addr_width});
 
     printf_P(PSTR(" 0x"));
     uint8_t* bufptr = buffer + sizeof buffer;
@@ -1112,7 +1112,7 @@ void RF24::closeReadingPipe( uint8_t pipe )
 void RF24::toggle_features(void)
 {
   std::array<uint8_t, 2> buffer {ACTIVATE, 0x73};
-  spi.transfer (gsl::as_span (buffer));
+  spi.transfer (buffer);
 }
 
 /****************************************************************************/
