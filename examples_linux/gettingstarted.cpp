@@ -26,6 +26,8 @@ TMRh20 2014 - Updated to work with optimized RF24 Arduino library
 #include <unistd.h>
 #include <RF24/RF24.h>
 
+#include <experimental/array>
+
 using namespace std;
 //
 // Hardware configuration
@@ -83,6 +85,8 @@ bool radioNumber = 1;
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint8_t pipes[][6] = {"1Node","2Node"};
 
+auto pipe0 = std::experimental::make_array<uint8_t> (1, 2, 3, 4, 0x11);
+auto pipe1 = std::experimental::make_array<uint8_t> (1, 2, 3, 4, 0x12);
 
 int main(int argc, char** argv){
 
@@ -121,10 +125,12 @@ int main(int argc, char** argv){
   // back and forth.
 
     if ( !radioNumber )    {
-      radio.openWritingPipe(pipes[0]);
+//      radio.openWritingPipe(pipes[0]);
+      radio.openWritingPipe (pipe0);
       radio.openReadingPipe(1,pipes[1]);
     } else {
-      radio.openWritingPipe(pipes[1]);
+//      radio.openWritingPipe(pipes[1]);
+      radio.openWritingPipe (pipe1);
       radio.openReadingPipe(1,pipes[0]);
     }
 	
