@@ -238,7 +238,7 @@ s   *
    * @param address The address of the pipe to open. Coordinate these pipe
    * addresses amongst nodes on the network.
    */
-  void openWritingPipe (gsl::span<uint8_t> const & address);
+  void openWritingPipe (gsl::span<const uint8_t> const & address);
 
   /**
    * Open a pipe for reading
@@ -992,7 +992,7 @@ private:
    */
   uint8_t write_register(uint8_t reg, uint8_t value);
 
-  uint8_t write_register (uint8_t reg, gsl::span<uint8_t> const & rx_data);
+  uint8_t write_register (uint8_t reg, gsl::span<const uint8_t> const & rx_data);
 
   /**
    * Write the transmit payload

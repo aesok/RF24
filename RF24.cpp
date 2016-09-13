@@ -65,7 +65,7 @@ uint8_t RF24::read_register(uint8_t reg)
 
 /****************************************************************************/
 
-uint8_t RF24::write_register (uint8_t reg, gsl::span<uint8_t> const & rx_data)
+uint8_t RF24::write_register (uint8_t reg, gsl::span<const uint8_t> const & rx_data)
 {
   uint8_t status;
 
@@ -991,7 +991,7 @@ void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
 
 /****************************************************************************/
 
-void RF24::openWritingPipe (gsl::span<uint8_t> const & address)
+void RF24::openWritingPipe (gsl::span<const uint8_t> const & address)
 {
   write_register (RX_ADDR_P0, address.first (addr_width));
   write_register (TX_ADDR, address.first (addr_width));
