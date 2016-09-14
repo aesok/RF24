@@ -203,14 +203,13 @@ public:
   bool write( const void* buf, uint8_t len );
 
   /**
-   * New: Open a pipe for writing via byte array. Old addressing format retained
-   * for compatibility.
+   * Open a pipe for writing.
    *
    * Only one writing pipe can be open at once, but you can change the address
    * you'll write to. Call stopListening() first.
    *
    * Addresses are assigned via a byte array, default is 5 byte address length
-s   *
+   *
    * @code
    *   uint8_t addresses[][6] = {"1Node","2Node"};
    *   radio.openWritingPipe(addresses[0]);
@@ -222,18 +221,6 @@ s   *
    *  radio.openReadingPipe(1,address);
    * @endcode
    * @see setAddressWidth
-   *
-   * @param address The address of the pipe to open. Coordinate these pipe
-   * addresses amongst nodes on the network.
-   */
-
-  void openWritingPipe(const uint8_t *address);
-
-  /**
-   * Open a pipe for writing.
-   *
-   * Only one writing pipe can be open at once, but you can change the address
-   * you'll write to. Call stopListening() first.
    *
    * @param address The address of the pipe to open. Coordinate these pipe
    * addresses amongst nodes on the network.
