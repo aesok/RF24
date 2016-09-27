@@ -1006,13 +1006,7 @@ void RF24::openWritingPipe(uint64_t value)
   // Note that AVR 8-bit uC's store this LSB first, and the NRF24L01(+)
   // expects it LSB first too, so we're good.
 
-  write_register(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), addr_width);
-  write_register(TX_ADDR, reinterpret_cast<uint8_t*>(&value), addr_width);
-  
-  
-  //const uint8_t max_payload_size = 32;
-  //write_register(RX_PW_P0,rf24_min(payload_size,max_payload_size));
-  write_register(RX_PW_P0,payload_size);
+  openWritingPipe ({reinterpret_cast<uint8_t*>(&value), addr_width});
 }
 
 /****************************************************************************/
